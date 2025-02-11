@@ -220,7 +220,21 @@ jobs:
   e2e_control-plane:
     runs-on: ubuntu-latest
     env:
+      DB_HOST: 127.0.0.1
+      DB_NAME: app
+      DB_PASSWORD: password
+      DB_USERNAME: app
       TEMPORAL_ADDRESS: 127.0.0.1:7233
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: app
+          MYSQL_RANDOM_ROOT_PASSWORD: "true"
+          MYSQL_PASSWORD: password
+          MYSQL_USER: app
+        ports:
+          - 3306:3306
     steps:
       - uses: actions/checkout@v4
 

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 import {
+  ClassSerializerInterceptor,
   ConsoleLogger,
   ConsoleLoggerOptions,
+  ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -36,7 +38,16 @@ async function bootstrap(): Promise<void> {
     { bufferLogs: true }, // Defer logs until logger is defined
   );
 
-  app.useGlobalFilters(new EntityValidationFilter()).enableShutdownHooks();
+  app
+    .useGlobalFilters(new EntityValidationFilter())
+    .useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+      }),
+    )
+    .useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
+    .enableShutdownHooks();
 
   const config = app.get(ConfigService);
 

@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "createdKey": "createdDate",
+    "updatedKey": "updatedDate"
+  },
+  "data": [
+    {
+      "id": "c92f19cb-23c7-45bc-ae32-568ee0e33f61",
+      "name": "National super",
+      "priceInPence": 2000,
+      "description": "Super for BS National beehive"
+    },
+    {
+      "id": "73a7ca07-8696-448e-b26c-136a88563347",
+      "name": "National brood",
+      "priceInPence": 2500,
+      "description": "Brood for BS National beehive"
+    },
+    {
+      "id": "0ed9e81a-5ea9-4840-b24a-546686559854",
+      "name": "National roof",
+      "priceInPence": 1500,
+      "description": "Roof for BS National beehive"
+    },
+    {
+      "id": "23ee4912-8cbc-4ae9-a401-ef950f8a4137",
+      "name": "National floor",
+      "priceInPence": 1000,
+      "description": "Floor for BS National beehive"
+    }
+  ]
+}

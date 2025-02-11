@@ -20,6 +20,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import config from './config';
 import { HealthModule } from './health/health.module';
 import { DatabaseLogger } from './lib/databaseLogger';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -41,6 +42,8 @@ import { DatabaseLogger } from './lib/databaseLogger';
     }),
 
     HealthModule,
+
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
