@@ -1,4 +1,35 @@
 services:
+  app:
+    build:
+      context: .
+      target: dev
+    environment:
+      LOG_LEVEL: debug
+      TEMPORAL_ADDRESS: temporal:7233
+    command: air -build.args_bin app
+    volumes:
+      - .:/go/app
+    links:
+      - temporal
+    depends_on:
+      - worker
+      - temporal-ui
+
+  worker:
+    build:
+      context: .
+      target: dev
+    environment:
+      LOG_LEVEL: debug
+      TEMPORAL_ADDRESS: temporal:7233
+    command: air -build.args_bin worker
+    volumes:
+      - .:/go/app
+    links:
+      - temporal
+    depends_on:
+      - temporal-ui
+
   ########################
   # Third-party services #
   ########################

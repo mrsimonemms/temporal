@@ -12,6 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+FROM golang AS dev
+WORKDIR /go/app
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOCACHE=/go/.cache
+USER 1000
+COPY . .
+COPY --from=cosmtrek/air /go/bin/air /go/bin/air
+RUN go get ./...
+CMD [ "air" ]
+
 FROM golang AS builder
 ARG GIT_COMMIT
 ARG GIT_REPO="github.com/mrsimonemms/temporal"
@@ -21,7 +32,6 @@ WORKDIR /app
 COPY . .
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-ENV PROJECT_NAME="${PROJECT_NAME}"
 RUN go build \
   -ldflags \
   "-w -s -X $GIT_REPO/cmd.Version=$VERSION -X $GIT_REPO/cmd.GitCommit=$GIT_COMMIT" \

@@ -17,24 +17,33 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var rootOpts struct {
+	LogLevel string
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "temporal",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Temporal demo application",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		level, err := zerolog.ParseLevel(rootOpts.LogLevel)
+		if err != nil {
+			return err
+		}
+		zerolog.SetGlobalLevel(level)
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -42,18 +51,25 @@ to quickly create a Cobra application.`,
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		log.Fatal().Err(err).Msg("Unable to start server")
 		os.Exit(1)
 	}
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	rootCmd.PersistentFlags().StringVarP(&rootOpts.LogLevel, "log-level", "l", bindEnv[string]("log-level", zerolog.InfoLevel.String()), fmt.Sprintf("log level: %s", "Set log level"))
+}
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.temporal.yaml)")
+func bindEnv[T any](key string, defaultValue ...any) T {
+	envvarName := strings.Replace(key, "-", "_", -1)
+	envvarName = strings.ToUpper(envvarName)
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	err := viper.BindEnv(key, envvarName)
+	cobra.CheckErr(err)
+
+	for _, val := range defaultValue {
+		viper.SetDefault(key, val)
+	}
+
+	return viper.Get(key).(T)
 }
