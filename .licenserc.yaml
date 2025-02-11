@@ -7,7 +7,7 @@ header:
     - dist
     - tmp
     - LICENSE
-    - .*
+    - "**/.*"
     - "go.*"
     - "**/*.{json,md,yml,yaml}"
     - "**/.gitkeep"

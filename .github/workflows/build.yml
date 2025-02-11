@@ -216,3 +216,32 @@ jobs:
           platforms: ${{ steps.docker.outputs.platforms }}
           push: ${{ steps.docker.outputs.push }}
           tags: ${{ steps.docker.outputs.image_name }},${{ steps.docker.outputs.container_tagged_image }}
+
+  e2e_control-plane:
+    runs-on: ubuntu-latest
+    env:
+      TEMPORAL_ADDRESS: 127.0.0.1:7233
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: "JS: Setup"
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Temporal CLI
+        uses: temporalio/setup-temporal@v0
+
+      - name: Start a local Temporal server
+        run: temporal server start-dev --headless &
+
+      - name: "JS: Install and test"
+        working-directory: ./components/control-plane
+        run: |
+          npm ci
+          npm run test:e2e

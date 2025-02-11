@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+COMPONENTS = ./components
+
 cruft-update:
 ifeq (,$(wildcard .cruft.json))
 	@echo "Cruft not configured"
@@ -19,3 +21,32 @@ else
 	@cruft check || cruft update --skip-apply-ask --refresh-private-variables
 endif
 .PHONY: cruft-update
+
+dev:
+	$(MAKE) install
+
+	docker compose up --watch
+.PHONY: dev
+
+destroy:
+	docker compose down
+.PHONY: destroy
+
+generate-db-migrations:
+	$(shell if [ -z "${NAME}" ]; then echo "NAME must be set"; exit 1; fi)
+	docker compose run --rm control-plane npm run migration:generate -- ./src/migrations/${NAME}
+.PHONY: generate-db-migrations
+
+install: install-js-deps
+
+install-js-deps:
+	@for dir in $(shell ls ${COMPONENTS}/*/package.json); do \
+		cd $$(dirname $$dir); \
+		echo "Installing $$PWD"; \
+		npm ci; \
+		cd - > /dev/null; \
+	done
+
+	@echo "Installing ${PWD}"
+	@npm ci
+.PHONY: install-js-deps
