@@ -3,13 +3,15 @@
   "image": "ghcr.io/mrsimonemms/devcontainers/full",
   "features": {
     "ghcr.io/mrsimonemms/devcontainers/cobra-cli:0": {},
-    "ghcr.io/guiyomh/features/goreleaser:0": {}
+    "ghcr.io/guiyomh/features/goreleaser:0": {},
+    "ghcr.io/devcontainers-extra/features/temporal-cli:1": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-vscode.makefile-tools",
-        "golang.go"
+        "golang.go",
+        "cweijan.vscode-mysql-client2"
       ],
       "settings": {}
     }
