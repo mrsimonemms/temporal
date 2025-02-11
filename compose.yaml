@@ -1,0 +1,43 @@
+services:
+  ########################
+  # Third-party services #
+  ########################
+  temporal:
+    image: temporalio/auto-setup:1.26
+    environment:
+      DB: mysql8
+      DB_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PWD: password
+      MYSQL_SEEDS: mysql
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/sql-config.yaml
+    volumes:
+      - ./dev/temporal:/etc/temporal/config/dynamicconfig
+    ports:
+      - 4101:7233
+    links:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 4102:3306
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:1.26
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+    links:
+      - temporal
+
+  temporal-ui:
+    image: temporalio/ui:2.34.0
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - 4100:8080
+    links:
+      - temporal

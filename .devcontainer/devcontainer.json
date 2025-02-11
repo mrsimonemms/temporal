@@ -4,14 +4,16 @@
   "features": {
     "ghcr.io/devcontainers-contrib/features/nestjs-cli:2": {},
     "ghcr.io/mrsimonemms/devcontainers/cobra-cli:0": {},
-    "ghcr.io/guiyomh/features/goreleaser:0": {}
+    "ghcr.io/guiyomh/features/goreleaser:0": {},
+    "ghcr.io/devcontainers-extra/features/temporal-cli:1": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-vscode.makefile-tools",
         "esbenp.prettier-vscode",
-        "golang.go"
+        "golang.go",
+        "cweijan.vscode-mysql-client2"
       ],
       "settings": {}
     }
