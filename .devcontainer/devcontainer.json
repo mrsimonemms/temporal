@@ -11,5 +11,8 @@
       ],
       "settings": {}
     }
+  },
+  "containerEnv": {
+    "TEMPORAL_ADDRESS": "localhost:7233"
   }
 }

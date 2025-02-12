@@ -5,6 +5,7 @@ repos:
       - id: license-eye
       - id: go-fmt-import
       - id: go-vet
+        entry: go vet ./...
       - id: gofumpt
       - id: go-err-check
       - id: go-static-check

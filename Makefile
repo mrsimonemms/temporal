@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CMDS = "./cmd"
+
 cruft-update:
 ifeq (,$(wildcard .cruft.json))
 	@echo "Cruft not configured"
@@ -19,3 +21,15 @@ else
 	@cruft check || cruft update --skip-apply-ask --refresh-private-variables
 endif
 .PHONY: cruft-update
+
+starter:
+	go run ${CMDS}/starter
+.PHONY: starter
+
+temporal-dev:
+	temporal server start-dev
+.PHONY: temporal-dev
+
+worker:
+	go run ${CMDS}/worker
+.PHONY: worker
