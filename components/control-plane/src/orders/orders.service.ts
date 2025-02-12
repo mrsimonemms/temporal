@@ -15,6 +15,7 @@
  */
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Client } from '@temporalio/client';
 import { ValidationError, validate } from 'class-validator';
 import { Repository } from 'typeorm';
 
@@ -34,6 +35,9 @@ export class OrdersService {
 
   @Inject(ProductsService)
   private readonly productService: ProductsService;
+
+  @Inject('ORDER_WORKFLOW_HANDLE')
+  private readonly orderWorkflowHandler: Client;
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     this.logger.debug('Create new order');
