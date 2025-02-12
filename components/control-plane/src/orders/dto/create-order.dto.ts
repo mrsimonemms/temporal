@@ -14,52 +14,42 @@
  * limitations under the License.
  */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ArrayMinSize, IsNotEmpty, Min } from 'class-validator';
 
-import { TypeormCreateUpdateDeleteTime } from '../..//lib/typeorm';
-import { OrderProduct } from '../../orders/entities/product.entity';
-
-@Entity()
-export class Product extends TypeormCreateUpdateDeleteTime {
+export class ProductDTO {
   @ApiProperty({
-    type: 'string',
-    format: 'uuid',
+    description: 'Product ID',
     example: 'c92f19cb-23c7-45bc-ae32-568ee0e33f61',
     required: true,
-    description: 'Product ID',
   })
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @IsNotEmpty()
+  productId: string;
 
   @ApiProperty({
-    type: 'string',
-    example: 'National super',
+    description: 'Number of items',
+    example: 2,
     required: true,
   })
-  @Column()
   @IsNotEmpty()
-  name: string;
+  @Min(1)
+  count: number;
+}
+
+export class CreateOrderDto {
+  @ApiProperty({
+    description: 'Products and quantities in the order',
+    required: true,
+    type: ProductDTO,
+    isArray: true,
+  })
+  @ArrayMinSize(1)
+  products: ProductDTO[];
 
   @ApiProperty({
-    type: 'number',
-    example: 2000,
+    description: 'User who owns the order',
     required: true,
-    description: 'Price in GBP pence',
+    example: 1,
   })
-  @Column()
   @IsNotEmpty()
-  priceInPence: number;
-
-  @OneToOne(() => OrderProduct, (order) => order.product)
-  orderProduct: Product;
-
-  @ApiProperty({
-    type: 'string',
-    example: 'Description for a national super',
-    required: true,
-  })
-  @Column()
-  @IsNotEmpty()
-  description: string;
+  userId: number;
 }

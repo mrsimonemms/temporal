@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { Product } from './entities/product.entity';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
+import { OrdersService } from './orders.service';
 
-@Module({
-  imports: [TypeOrmModule.forFeature([Product])],
-  controllers: [ProductsController],
-  providers: [ProductsService],
-  exports: [ProductsService],
-})
-export class ProductsModule {}
+describe('OrdersService', () => {
+  let service: OrdersService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [OrdersService],
+    }).compile();
+
+    service = module.get<OrdersService>(OrdersService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+});

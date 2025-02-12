@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { PartialType } from '@nestjs/swagger';
 
-import { Product } from './entities/product.entity';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
+import { CreateOrderDto } from './create-order.dto';
 
-@Module({
-  imports: [TypeOrmModule.forFeature([Product])],
-  controllers: [ProductsController],
-  providers: [ProductsService],
-  exports: [ProductsService],
-})
-export class ProductsModule {}
+export class UpdateOrderDto extends PartialType(CreateOrderDto) {}

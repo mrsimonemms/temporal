@@ -14,52 +14,59 @@
  * limitations under the License.
  */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsInt, IsNotEmpty } from 'class-validator';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-import { TypeormCreateUpdateDeleteTime } from '../..//lib/typeorm';
-import { OrderProduct } from '../../orders/entities/product.entity';
+import { TypeormCreateUpdateDeleteTime } from '../../lib/typeorm';
+import { OrderProduct } from './product.entity';
+
+export enum OrderStatus {
+  PREPARING = 'PREPARING',
+}
 
 @Entity()
-export class Product extends TypeormCreateUpdateDeleteTime {
+export class Order extends TypeormCreateUpdateDeleteTime {
   @ApiProperty({
     type: 'string',
     format: 'uuid',
     example: 'c92f19cb-23c7-45bc-ae32-568ee0e33f61',
     required: true,
-    description: 'Product ID',
+    description: 'Order ID',
   })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty({
-    type: 'string',
-    example: 'National super',
-    required: true,
+    description: 'Order status',
+    enum: OrderStatus,
+    default: OrderStatus.PREPARING,
   })
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PREPARING,
+  })
   @IsNotEmpty()
-  name: string;
+  status: OrderStatus;
 
+  // This would link through to a user - out-of-scope
   @ApiProperty({
-    type: 'number',
-    example: 2000,
+    description: 'User ID',
     required: true,
-    description: 'Price in GBP pence',
+    example: 1,
   })
   @Column()
   @IsNotEmpty()
-  priceInPence: number;
+  @IsInt()
+  userId: number;
 
-  @OneToOne(() => OrderProduct, (order) => order.product)
-  orderProduct: Product;
-
-  @ApiProperty({
-    type: 'string',
-    example: 'Description for a national super',
-    required: true,
-  })
-  @Column()
-  @IsNotEmpty()
-  description: string;
+  @OneToMany(() => OrderProduct, (o) => o.order, { eager: true, cascade: true })
+  @JoinColumn()
+  products: OrderProduct[];
 }
