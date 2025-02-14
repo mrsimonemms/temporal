@@ -23,13 +23,13 @@ endif
 .PHONY: cruft-update
 
 starter:
-	go run ${CMDS}/starter
+	@go run ${CMDS}/starter
 .PHONY: starter
 
 temporal-dev:
-	temporal server start-dev
+	@temporal server start-dev
 .PHONY: temporal-dev
 
 worker:
-	go run ${CMDS}/worker
+	@go run ${CMDS}/worker
 .PHONY: worker
