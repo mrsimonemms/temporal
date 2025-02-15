@@ -44,8 +44,7 @@ chance of failure to demonstrate the error handling workflow of Temporal.
 
 ## How to run
 
-The Temporal UI server will be available on [localhost:8233](http://localhost:8233)
-for both these runtimes.
+The Temporal UI server will be available on [localhost:8233](http://localhost:8233).
 
 ### DevContainers/VSCode
 
