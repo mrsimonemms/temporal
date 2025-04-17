@@ -57,16 +57,32 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 	logger.Debug(("Create nodes in cloud provider"))
 	project.Nodes = make([]*NodeResult, 0)
 
-	for i := 0; i < cfg.VMCount; i++ {
-		var node *NodeResult
+	type nodeResult struct {
+		ctx workflow.Context
+		w   workflow.ChildWorkflowFuture
+	}
 
+	nodeResults := map[int]nodeResult{}
+
+	// Invoke the child workflow in parallel
+	for i := 0; i < cfg.VMCount; i++ {
 		// Set ID so can track the jobs in dashboard easier
 		childCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
 			WorkflowTaskTimeout: time.Hour,
 			WorkflowID:          fmt.Sprintf("%s_node_%d", workflow.GetInfo(ctx).WorkflowExecution.ID, i),
 		})
 
-		if err := workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, project).Get(childCtx, &node); err != nil {
+		nodeResults[i] = nodeResult{
+			ctx: childCtx,
+			w:   workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, project),
+		}
+	}
+
+	// Now the child workflows are running, wait for the results
+	for _, k := range nodeResults {
+		var node *NodeResult
+
+		if err := k.w.Get(k.ctx, &node); err != nil {
 			logger.Error("Error provisioning nodes", err)
 			return nil, fmt.Errorf("error provisioning nodes: %w", err)
 		}
