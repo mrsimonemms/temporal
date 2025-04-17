@@ -53,7 +53,7 @@ func main() {
 		Provider: workflow.CloudProviderAWS,
 		Region:   "eu-west-2",
 		Subnet:   "10.0.0.0/24",
-		VMCount:  1,
+		VMCount:  3,
 	}
 
 	we, err := c.ExecuteWorkflow(context.Background(), workflowOptions, workflow.CloudProvisionWorkflow, config)
