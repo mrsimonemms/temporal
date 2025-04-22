@@ -62,24 +62,25 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 		w   workflow.ChildWorkflowFuture
 	}
 
-	nodeResults := map[int]nodeResult{}
+	provisionNodeFutures := []nodeResult{}
 
-	// Invoke the child workflow in parallel
-	for i := 0; i < cfg.VMCount; i++ {
+	// Invoke the child workflows in parallel
+	for i := range cfg.VMCount {
 		// Set ID so can track the jobs in dashboard easier
 		childCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
 			WorkflowTaskTimeout: time.Hour,
 			WorkflowID:          fmt.Sprintf("%s_node_%d", workflow.GetInfo(ctx).WorkflowExecution.ID, i),
 		})
 
-		nodeResults[i] = nodeResult{
+		// Execute the child workflow and store results as a Future
+		provisionNodeFutures = append(provisionNodeFutures, nodeResult{
 			ctx: childCtx,
 			w:   workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, project),
-		}
+		})
 	}
 
 	// Now the child workflows are running, wait for the results
-	for _, k := range nodeResults {
+	for _, k := range provisionNodeFutures {
 		var node *NodeResult
 
 		if err := k.w.Get(k.ctx, &node); err != nil {
