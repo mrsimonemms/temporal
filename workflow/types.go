@@ -45,6 +45,10 @@ type NodeResult struct {
 	Port    int32
 }
 
+type NodeReadyResult struct {
+	Ready bool
+}
+
 type Resource struct {
 	ID string
 }

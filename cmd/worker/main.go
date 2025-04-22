@@ -55,6 +55,7 @@ func main() {
 	w.RegisterActivity(workflow.CreateProjectActivity)
 	w.RegisterActivity(workflow.SetupNetworkActivity)
 	w.RegisterActivity(workflow.ProvisionNodeActivity)
+	w.RegisterActivity(workflow.AwaitForNodeRunningActivity)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {

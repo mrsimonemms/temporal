@@ -116,5 +116,11 @@ func ProvisionNodeWorkflow(ctx workflow.Context, project *ProjectResult) (*NodeR
 		return nil, fmt.Errorf("error executing node provision activity: %w", err)
 	}
 
+	var isReady NodeReadyResult
+	if err := workflow.ExecuteActivity(ctx, AwaitForNodeRunningActivity, node).Get(ctx, &isReady); err != nil {
+		logger.Error("Error whilst waiting for node to become ready", err)
+		return nil, fmt.Errorf("error waiting for node to become ready: %w", err)
+	}
+
 	return &node, nil
 }
