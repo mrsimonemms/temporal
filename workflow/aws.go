@@ -62,7 +62,7 @@ func createAWSNode(ctx context.Context, _ *ProjectResult) (*NodeResult, error) {
 	return &NodeResult{
 		ID:      uuid.NewString(),
 		Name:    generator.Generate(),
-		Address: string(generateIPAddress()),
+		Address: generateIPAddress(),
 		Port:    22,
 	}, nil
 }

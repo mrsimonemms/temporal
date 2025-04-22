@@ -41,7 +41,7 @@ type NetworkResult struct {
 type NodeResult struct {
 	ID      string
 	Name    string
-	Address string
+	Address net.IP
 	Port    int32
 }
 
@@ -74,7 +74,7 @@ func simulateFailure() error {
 }
 
 // Generate an IP address - this simulates the cloud provider's process of assigning an IP
-func generateIPAddress() []byte {
+func generateIPAddress() net.IP {
 	buf := make([]byte, 4)
 
 	ip := rand.Uint32()
