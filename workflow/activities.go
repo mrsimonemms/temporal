@@ -27,7 +27,7 @@ import (
 
 func CreateProjectActivity(ctx context.Context, config CloudConfig) (*ProjectResult, error) {
 	logger := activity.GetLogger(ctx)
-	logger.Info("CreateProjectActivity", config.Provider)
+	logger.Info("CreateProjectActivity", "provider", config.Provider)
 
 	switch config.Provider {
 	case CloudProviderAWS:

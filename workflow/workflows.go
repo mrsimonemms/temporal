@@ -41,20 +41,20 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 	logger.Debug("Create project in cloud provider")
 	var project *ProjectResult
 	if err := workflow.ExecuteActivity(ctx, CreateProjectActivity, cfg).Get(ctx, &project); err != nil {
-		logger.Error("Error executing cloud provisioning activity", err)
+		logger.Error("Error executing cloud provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing cloud provision activity: %w", err)
 	}
 
 	logger.Debug("Create network in cloud provider")
 	var network *NetworkResult
 	if err := workflow.ExecuteActivity(ctx, SetupNetworkActivity, project).Get(ctx, &network); err != nil {
-		logger.Error("Error setting up network activity", err)
+		logger.Error("Error setting up network activity", "error", err)
 		return nil, fmt.Errorf("error setting up network activity: %w", err)
 	}
 	project.Network = network
 
 	// Run as a child process to fan-out to support multiple node creation
-	logger.Debug(("Create nodes in cloud provider"))
+	logger.Debug("Create nodes in cloud provider")
 	project.Nodes = make([]*NodeResult, 0)
 
 	type nodeResult struct {
@@ -84,7 +84,7 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 		var node *NodeResult
 
 		if err := k.w.Get(k.ctx, &node); err != nil {
-			logger.Error("Error provisioning nodes", err)
+			logger.Error("Error provisioning nodes", "error", err)
 			return nil, fmt.Errorf("error provisioning nodes: %w", err)
 		}
 
@@ -112,13 +112,13 @@ func ProvisionNodeWorkflow(ctx workflow.Context, project *ProjectResult) (*NodeR
 	var node NodeResult
 	err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, project).Get(ctx, &node)
 	if err != nil {
-		logger.Error("Error executing node provisioning activity", err)
+		logger.Error("Error executing node provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing node provision activity: %w", err)
 	}
 
 	var isReady NodeReadyResult
 	if err := workflow.ExecuteActivity(ctx, AwaitForNodeRunningActivity, node).Get(ctx, &isReady); err != nil {
-		logger.Error("Error whilst waiting for node to become ready", err)
+		logger.Error("Error whilst waiting for node to become ready", "error", err)
 		return nil, fmt.Errorf("error waiting for node to become ready: %w", err)
 	}
 
