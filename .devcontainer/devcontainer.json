@@ -1,18 +1,8 @@
 {
-  "image": "ghcr.io/mrsimonemms/devcontainers/full",
+  "image": "ghcr.io/mrsimonemms/devcontainers/temporal_min",
   "name": "devcontainer",
   "features": {
-    "ghcr.io/devcontainers-extra/features/temporal-cli:1": {}
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-vscode.makefile-tools"
-      ],
-      "settings": {}
-    }
-  },
-  "containerEnv": {
-    "TEMPORAL_ADDRESS": "localhost:7233"
+    "ghcr.io/devcontainers/features/go:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
   }
 }
