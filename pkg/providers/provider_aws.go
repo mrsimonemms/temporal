@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package workflow
+package providers
 
 import (
 	"context"
 	"fmt"
+	"math/rand/v2"
 	"net"
 	"time"
 
@@ -27,31 +28,57 @@ import (
 	"go.temporal.io/sdk/activity"
 )
 
-func createAWSProject(ctx context.Context, cfg CloudConfig) (*ProjectResult, error) {
+type aws struct {
+	cfg *CloudConfig
+}
+
+// CheckNodeReady implements Provider.
+func (a aws) CheckNodeReady(ctx context.Context, node *NodeResult) error {
+	// Generate a local timeout - this is not a Temporal sleep, but exists to
+	// simulate the time taken by the VM's SSH server to become ready.
+	minValue := 1
+	maxValue := 30
+	//nolint:gosec // ignore weak number generator error
+	timeoutLength := rand.IntN(maxValue-minValue+1) + minValue
+	timeout := time.Duration(timeoutLength) * time.Second
+
+	logger := activity.GetLogger(ctx)
+	logger.Info("Timing out", "timeout", timeout)
+
+	time.Sleep(timeout)
+	return nil
+}
+
+func (a aws) CreateNetwork(ctx context.Context, project *ProjectResult) (*NetworkResult, error) {
 	logger := activity.GetLogger(ctx)
 
-	logger.Debug("Sleeping to simulate project creation job")
-	time.Sleep(time.Second)
+	logger.Debug("Sleeping to simulate network setup job")
+	time.Sleep(time.Second * 5)
 
-	if err := simulateFailure(); err != nil {
+	if err := SimulateFailure(); err != nil {
 		return nil, fmt.Errorf("simulated cloud failure: %w", err)
 	}
 
+	_, subnet, err := net.ParseCIDR(project.Subnet)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing cidr: %w", err)
+	}
+
 	// These values may come from the project or from input variables
-	return &ProjectResult{
-		CloudConfig: cfg,
-		ID:          uuid.NewString(),
+	return &NetworkResult{
+		ID:     uuid.NewString(),
+		Region: a.cfg.Region,
+		Subnet: subnet,
 	}, nil
 }
 
-// project isn't actually used in here - would be part of the API call to cloud in reality
-func createAWSNode(ctx context.Context, _ *ProjectResult) (*NodeResult, error) {
+func (a aws) CreateNode(ctx context.Context, project *ProjectResult) (*NodeResult, error) {
 	logger := activity.GetLogger(ctx)
 
 	logger.Debug("Sleeping to simulate node setup job")
 	time.Sleep(time.Second * 5)
 
-	if err := simulateFailure(); err != nil {
+	if err := SimulateFailure(); err != nil {
 		return nil, fmt.Errorf("simulated cloud failure: %w", err)
 	}
 
@@ -62,30 +89,30 @@ func createAWSNode(ctx context.Context, _ *ProjectResult) (*NodeResult, error) {
 	return &NodeResult{
 		ID:      uuid.NewString(),
 		Name:    generator.Generate(),
-		Address: generateIPAddress(),
+		Address: GenerateIPAddress(),
 		Port:    22,
 	}, nil
 }
 
-func createAWSNetwork(ctx context.Context, cfg *ProjectResult, subnetCidr string) (*NetworkResult, error) {
+func (a aws) CreateProject(ctx context.Context) (*ProjectResult, error) {
 	logger := activity.GetLogger(ctx)
 
-	logger.Debug("Sleeping to simulate network setup job")
-	time.Sleep(time.Second * 5)
+	logger.Debug("Sleeping to simulate project creation job")
+	time.Sleep(time.Second)
 
-	if err := simulateFailure(); err != nil {
+	if err := SimulateFailure(); err != nil {
 		return nil, fmt.Errorf("simulated cloud failure: %w", err)
 	}
 
-	_, subnet, err := net.ParseCIDR(subnetCidr)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing cidr: %w", err)
-	}
-
 	// These values may come from the project or from input variables
-	return &NetworkResult{
-		ID:     uuid.NewString(),
-		Region: cfg.Region,
-		Subnet: subnet,
+	return &ProjectResult{
+		CloudConfig: *a.cfg,
+		ID:          uuid.NewString(),
+	}, nil
+}
+
+func NewAWS(cfg *CloudConfig) (Provider, error) {
+	return aws{
+		cfg: cfg,
 	}, nil
 }

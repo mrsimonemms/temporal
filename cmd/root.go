@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mrsimonemms/temporal/workflow"
+	"github.com/mrsimonemms/temporal/pkg/workflow"
 	"github.com/rs/zerolog/log"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"github.com/spf13/cobra"

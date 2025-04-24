@@ -20,7 +20,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/mrsimonemms/temporal/workflow"
+	"github.com/mrsimonemms/temporal/pkg/providers"
+	"github.com/mrsimonemms/temporal/pkg/workflow"
 	"github.com/rs/zerolog/log"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"github.com/spf13/cobra"
@@ -29,7 +30,7 @@ import (
 	tLog "go.temporal.io/sdk/log"
 )
 
-var triggerOpts workflow.CloudConfig
+var triggerOpts providers.CloudConfig
 
 var triggerProvider string
 
@@ -53,7 +54,7 @@ var triggerCmd = &cobra.Command{
 			TaskQueue: "cloud-provisioning",
 		}
 
-		triggerOpts.Provider = workflow.CloudProvider(triggerProvider)
+		triggerOpts.Provider = providers.CloudProvider(triggerProvider)
 
 		we, err := c.ExecuteWorkflow(context.Background(), workflowOptions, workflow.CloudProvisionWorkflow, triggerOpts)
 		if err != nil {
@@ -63,7 +64,7 @@ var triggerCmd = &cobra.Command{
 		log.Info().Str("WorkflowID", we.GetID()).Str("RunID", we.GetRunID()).Msg("Started workflow")
 
 		// Synchronously wait for the workflow completion.
-		var result workflow.ProjectResult
+		var result providers.ProjectResult
 		err = we.Get(context.Background(), &result)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Unable to get workflow result")
@@ -84,6 +85,6 @@ func init() {
 	bindEnv("subnet", "10.0.0.0/24")
 	triggerCmd.Flags().StringVar(&triggerOpts.Subnet, "subnet", viper.GetString("subnet"), "Subnet to use for the network")
 
-	bindEnv("provider", string(workflow.CloudProviderAWS))
+	bindEnv("provider", string(providers.CloudProviderAWS))
 	triggerCmd.Flags().StringVar(&triggerProvider, "provider", viper.GetString("provider"), "Cloud provider to use")
 }
