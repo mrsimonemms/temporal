@@ -20,11 +20,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mrsimonemms/temporal/pkg/providers"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 )
 
-func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResult, error) {
+func CloudProvisionWorkflow(ctx workflow.Context, cfg providers.CloudConfig) (*providers.ProjectResult, error) {
 	logger := workflow.GetLogger(ctx)
 	logger.Info("Starting cloud provisioning workflow")
 
@@ -39,15 +40,15 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 	})
 
 	logger.Debug("Create project in cloud provider")
-	var project *ProjectResult
+	var project *providers.ProjectResult
 	if err := workflow.ExecuteActivity(ctx, CreateProjectActivity, cfg).Get(ctx, &project); err != nil {
 		logger.Error("Error executing cloud provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing cloud provision activity: %w", err)
 	}
 
 	logger.Debug("Create network in cloud provider")
-	var network *NetworkResult
-	if err := workflow.ExecuteActivity(ctx, SetupNetworkActivity, project).Get(ctx, &network); err != nil {
+	var network *providers.NetworkResult
+	if err := workflow.ExecuteActivity(ctx, SetupNetworkActivity, cfg, project).Get(ctx, &network); err != nil {
 		logger.Error("Error setting up network activity", "error", err)
 		return nil, fmt.Errorf("error setting up network activity: %w", err)
 	}
@@ -55,7 +56,7 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 
 	// Run as a child process to fan-out to support multiple node creation
 	logger.Debug("Create nodes in cloud provider")
-	project.Nodes = make([]*NodeResult, 0)
+	project.Nodes = make([]*providers.NodeResult, 0)
 
 	type nodeResult struct {
 		ctx workflow.Context
@@ -75,13 +76,13 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 		// Execute the child workflow and store results as a Future
 		provisionNodeFutures = append(provisionNodeFutures, nodeResult{
 			ctx: childCtx,
-			w:   workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, project),
+			w:   workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, cfg, project),
 		})
 	}
 
 	// Now the child workflows are running, wait for the results
 	for _, k := range provisionNodeFutures {
-		var node *NodeResult
+		var node *providers.NodeResult
 
 		if err := k.w.Get(k.ctx, &node); err != nil {
 			logger.Error("Error provisioning nodes", "error", err)
@@ -95,7 +96,11 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg CloudConfig) (*ProjectResu
 }
 
 // Run as a child worker
-func ProvisionNodeWorkflow(ctx workflow.Context, project *ProjectResult) (*NodeResult, error) {
+func ProvisionNodeWorkflow(
+	ctx workflow.Context,
+	cfg providers.CloudConfig,
+	project *providers.ProjectResult,
+) (*providers.NodeResult, error) {
 	logger := workflow.GetLogger(ctx)
 	logger.Info("Starting node provisioning workflow")
 
@@ -109,15 +114,15 @@ func ProvisionNodeWorkflow(ctx workflow.Context, project *ProjectResult) (*NodeR
 		},
 	})
 
-	var node NodeResult
-	err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, project).Get(ctx, &node)
+	var node providers.NodeResult
+	err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, cfg, project).Get(ctx, &node)
 	if err != nil {
 		logger.Error("Error executing node provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing node provision activity: %w", err)
 	}
 
-	var isReady NodeReadyResult
-	if err := workflow.ExecuteActivity(ctx, AwaitForNodeRunningActivity, node).Get(ctx, &isReady); err != nil {
+	var isReady providers.NodeReadyResult
+	if err := workflow.ExecuteActivity(ctx, AwaitForNodeRunningActivity, cfg, node).Get(ctx, &isReady); err != nil {
 		logger.Error("Error whilst waiting for node to become ready", "error", err)
 		return nil, fmt.Errorf("error waiting for node to become ready: %w", err)
 	}
