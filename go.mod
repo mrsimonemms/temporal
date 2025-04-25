@@ -9,6 +9,7 @@ require (
 	github.com/samber/slog-zerolog/v2 v2.7.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
+	github.com/stretchr/testify v1.10.0
 	go.temporal.io/sdk v1.32.1
 )
 
@@ -37,7 +38,6 @@ require (
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.temporal.io/api v1.44.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

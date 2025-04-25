@@ -53,16 +53,25 @@ func SetupNetworkActivity(
 }
 
 // Simulate making an SSH connection and checking for cloud-config to become ready
-func AwaitForNodeRunningActivity(ctx context.Context, config providers.CloudConfig, node *providers.NodeResult) error {
+func AwaitForNodeRunningActivity(
+	ctx context.Context,
+	config providers.CloudConfig,
+	node *providers.NodeResult,
+) (*providers.NodeReadyResult, error) {
 	logger := activity.GetLogger(ctx)
 	logger.Info("ProvisionNodeActivity", "provider", config.Provider)
 
 	cloudProvider, err := config.GetProvider()
 	if err != nil {
-		return fmt.Errorf("error initializing provider: %w", err)
+		return nil, fmt.Errorf("error initializing provider: %w", err)
 	}
 
-	return cloudProvider.CheckNodeReady(ctx, node)
+	if err := cloudProvider.CheckNodeReady(ctx, node); err != nil {
+		return nil, err
+	}
+
+	// If there's no error then it's ready
+	return &providers.NodeReadyResult{Ready: true}, nil
 }
 
 func ProvisionNodeActivity(ctx context.Context,

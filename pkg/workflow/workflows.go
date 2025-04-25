@@ -115,8 +115,7 @@ func ProvisionNodeWorkflow(
 	})
 
 	var node providers.NodeResult
-	err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, cfg, project).Get(ctx, &node)
-	if err != nil {
+	if err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, cfg, project).Get(ctx, &node); err != nil {
 		logger.Error("Error executing node provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing node provision activity: %w", err)
 	}

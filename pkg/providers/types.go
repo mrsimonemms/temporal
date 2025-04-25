@@ -76,6 +76,11 @@ type CloudConfig struct {
 }
 
 func (c CloudConfig) GetProvider() (Provider, error) {
+	return GetProvider(c)
+}
+
+// Allow command to be mockable
+var GetProvider = func(c CloudConfig) (Provider, error) {
 	switch c.Provider {
 	case CloudProviderAWS:
 		return NewAWS(&c)
