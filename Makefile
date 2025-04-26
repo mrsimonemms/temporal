@@ -23,7 +23,7 @@ endif
 .PHONY: cruft-update
 
 starter:
-	@go run ${CMDS}/starter
+	@go run . trigger
 .PHONY: starter
 
 temporal-dev:
@@ -31,5 +31,5 @@ temporal-dev:
 .PHONY: temporal-dev
 
 worker:
-	@go run ${CMDS}/worker
+	@go run .
 .PHONY: worker

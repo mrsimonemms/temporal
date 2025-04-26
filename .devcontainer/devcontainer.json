@@ -3,6 +3,10 @@
   "name": "devcontainer",
   "features": {
     "ghcr.io/devcontainers/features/go:1": {},
-    "ghcr.io/devcontainers/features/node:1": {}
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/mrsimonemms/devcontainers/cobra-cli:0": {}
+  },
+  "postCreateCommand": {
+    "bootstrap": "ln -s $PWD/.cobra.yaml $HOME/.cobra.yaml"
   }
 }
