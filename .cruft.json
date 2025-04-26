@@ -1,14 +1,14 @@
 {
   "template": "https://github.com/mrsimonemms/new",
-  "commit": "c7eca444a1717c08c53f7a63a2395eb29566c389",
-  "checkout": "main",
+  "commit": "da19260a4de21b166bdcab7a1331ad4b40a16729",
+  "checkout": null,
   "context": {
     "cookiecutter": {
       "project_name": "temporal",
       "description": "Temporal demo",
       "author": "Simon Emms <simon@simonemms.com>",
       "_template": "https://github.com/mrsimonemms/new",
-      "_commit": "c7eca444a1717c08c53f7a63a2395eb29566c389"
+      "_commit": "da19260a4de21b166bdcab7a1331ad4b40a16729"
     }
   },
   "directory": "blank",
