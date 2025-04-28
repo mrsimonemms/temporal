@@ -58,12 +58,7 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg providers.CloudConfig) (*p
 	logger.Debug("Create nodes in cloud provider")
 	project.Nodes = make([]*providers.NodeResult, 0)
 
-	type nodeResult struct {
-		ctx workflow.Context
-		w   workflow.ChildWorkflowFuture
-	}
-
-	provisionNodeFutures := []nodeResult{}
+	provisionNodeFutures := map[workflow.Context]workflow.ChildWorkflowFuture{}
 
 	// Invoke the child workflows in parallel
 	for i := range cfg.VMCount {
@@ -74,17 +69,14 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg providers.CloudConfig) (*p
 		})
 
 		// Execute the child workflow and store results as a Future
-		provisionNodeFutures = append(provisionNodeFutures, nodeResult{
-			ctx: childCtx,
-			w:   workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, cfg, project),
-		})
+		provisionNodeFutures[childCtx] = workflow.ExecuteChildWorkflow(childCtx, ProvisionNodeWorkflow, cfg, project)
 	}
 
 	// Now the child workflows are running, wait for the results
-	for _, k := range provisionNodeFutures {
+	for ctx, workflow := range provisionNodeFutures {
 		var node *providers.NodeResult
 
-		if err := k.w.Get(k.ctx, &node); err != nil {
+		if err := workflow.Get(ctx, &node); err != nil {
 			logger.Error("Error provisioning nodes", "error", err)
 			return nil, fmt.Errorf("error provisioning nodes: %w", err)
 		}
@@ -114,17 +106,17 @@ func ProvisionNodeWorkflow(
 		},
 	})
 
-	var node providers.NodeResult
+	var node *providers.NodeResult
 	if err := workflow.ExecuteActivity(ctx, ProvisionNodeActivity, cfg, project).Get(ctx, &node); err != nil {
 		logger.Error("Error executing node provisioning activity", "error", err)
 		return nil, fmt.Errorf("error executing node provision activity: %w", err)
 	}
 
-	var isReady providers.NodeReadyResult
+	var isReady *providers.NodeReadyResult
 	if err := workflow.ExecuteActivity(ctx, AwaitForNodeRunningActivity, cfg, node).Get(ctx, &isReady); err != nil {
 		logger.Error("Error whilst waiting for node to become ready", "error", err)
 		return nil, fmt.Errorf("error waiting for node to become ready: %w", err)
 	}
 
-	return &node, nil
+	return node, nil
 }
