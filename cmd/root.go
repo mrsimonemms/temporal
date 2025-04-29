@@ -17,22 +17,22 @@
 package cmd
 
 import (
-	"log/slog"
 	"os"
 	"strings"
 
+	"github.com/mrsimonemms/temporal/pkg/temporal"
 	"github.com/mrsimonemms/temporal/pkg/workflow"
 	"github.com/rs/zerolog/log"
-	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.temporal.io/sdk/client"
-	tLog "go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/worker"
 )
 
 var rootOpts struct {
-	Host string
+	APIKey    string
+	Host      string
+	Namespace string
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -40,12 +40,7 @@ var rootCmd = &cobra.Command{
 	Use:   "temporal",
 	Short: "Temporal demo application",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := client.Dial(client.Options{
-			HostPort: rootOpts.Host,
-			Logger: tLog.NewStructuredLogger(slog.New(slogzerolog.Option{
-				Logger: &log.Logger,
-			}.NewZerologHandler())),
-		})
+		c, err := temporal.NewClient(rootOpts.Host, rootOpts.Namespace, rootOpts.APIKey)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Unable to create Temporal client")
 		}
@@ -94,4 +89,17 @@ func bindEnv(key string, defaultValue ...any) {
 func init() {
 	bindEnv("temporal-address", client.DefaultHostPort)
 	rootCmd.PersistentFlags().StringVarP(&rootOpts.Host, "temporal-address", "a", viper.GetString("temporal-address"), "Address for Temporal server")
+
+	bindEnv("temporal-key", "")
+	rootCmd.PersistentFlags().StringVarP(&rootOpts.APIKey, "temporal-key", "k", viper.GetString("temporal-key"), "API key for Temporal server")
+	rootCmd.PersistentFlags().Lookup("temporal-key").DefValue = "xxx"
+
+	bindEnv("temporal-namespace", client.DefaultNamespace)
+	rootCmd.PersistentFlags().StringVarP(
+		&rootOpts.Namespace,
+		"temporal-namespace",
+		"n",
+		viper.GetString("temporal-namespace"),
+		"Namespace for Temporal server",
+	)
 }

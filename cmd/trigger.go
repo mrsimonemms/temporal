@@ -18,16 +18,14 @@ package cmd
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/mrsimonemms/temporal/pkg/providers"
+	"github.com/mrsimonemms/temporal/pkg/temporal"
 	"github.com/mrsimonemms/temporal/pkg/workflow"
 	"github.com/rs/zerolog/log"
-	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.temporal.io/sdk/client"
-	tLog "go.temporal.io/sdk/log"
 )
 
 var triggerOpts providers.CloudConfig
@@ -39,12 +37,7 @@ var triggerCmd = &cobra.Command{
 	Use:   "trigger",
 	Short: "Run the Temporal workflow",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := client.Dial(client.Options{
-			HostPort: rootOpts.Host,
-			Logger: tLog.NewStructuredLogger(slog.New(slogzerolog.Option{
-				Logger: &log.Logger,
-			}.NewZerologHandler())),
-		})
+		c, err := temporal.NewClient(rootOpts.Host, rootOpts.Namespace, rootOpts.APIKey)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Unable to create Temporal client")
 		}
