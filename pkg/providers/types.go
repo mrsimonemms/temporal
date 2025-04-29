@@ -64,8 +64,8 @@ type Resource struct {
 type CloudProvider string
 
 const (
-	CloudProviderAWS   CloudProvider = "AWS"
-	CloudProviderAzure CloudProvider = "Azure"
+	CloudProviderAWS     CloudProvider = "aws"
+	CloudProviderHetzner CloudProvider = "hetzner"
 )
 
 type CloudConfig struct {
@@ -84,6 +84,8 @@ var GetProvider = func(c CloudConfig) (Provider, error) {
 	switch c.Provider {
 	case CloudProviderAWS:
 		return NewAWS(&c)
+	case CloudProviderHetzner:
+		return NewHetzner(&c)
 	default:
 		return nil, fmt.Errorf("unsupported provider: %s", c.Provider)
 	}
