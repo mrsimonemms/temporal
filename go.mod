@@ -3,6 +3,7 @@ module github.com/mrsimonemms/temporal
 go 1.23.6
 
 require (
+	github.com/golang/snappy v1.0.0
 	github.com/google/uuid v1.6.0
 	github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e
 	github.com/rs/zerolog v1.33.0
@@ -10,6 +11,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
+	go.temporal.io/api v1.44.1
 	go.temporal.io/sdk v1.32.1
 	google.golang.org/grpc v1.70.0
 )
@@ -40,7 +42,6 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	go.temporal.io/api v1.44.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac // indirect
