@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import '../app.scss';
 
-export const prerender = false;
-export const ssr = true;
-export const trailingSlash = 'always';
+import type { Actions } from './$types';
+
+export const actions = {
+  default: async (event) => {
+    console.log({ event });
+    console.log("hello, I'm submitting");
+  },
+} satisfies Actions;

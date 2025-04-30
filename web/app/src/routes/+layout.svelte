@@ -24,4 +24,8 @@
   <link rel="stylesheet" href="{base}/css/materialdesignicons.min.css" />
 </svelte:head>
 
-{@render children()}
+<div class="section is-medium">
+  <div class="container">
+    {@render children()}
+  </div>
+</div>
