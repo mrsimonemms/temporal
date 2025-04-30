@@ -64,8 +64,7 @@ type Resource struct {
 type CloudProvider string
 
 const (
-	CloudProviderAWS   CloudProvider = "AWS"
-	CloudProviderAzure CloudProvider = "Azure"
+	CloudProviderAWS CloudProvider = "aws"
 )
 
 type CloudConfig struct {
