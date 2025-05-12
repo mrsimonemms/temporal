@@ -12,29 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP = "./web/app"
-CMDS = "./cmd"
-
-app:
-	@cd ${APP} && npm run dev
-.PHONY: app
-
-cruft-update:
-ifeq (,$(wildcard .cruft.json))
-	@echo "Cruft not configured"
-else
-	@cruft check || cruft update --skip-apply-ask --refresh-private-variables
-endif
-.PHONY: cruft-update
-
-starter:
-	@go run . trigger
-.PHONY: starter
-
-temporal-dev:
-	@temporal server start-dev
-.PHONY: temporal-dev
-
-worker:
-	@go run .
-.PHONY: worker
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb

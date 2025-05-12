@@ -8,5 +8,13 @@
   },
   "postCreateCommand": {
     "bootstrap": "ln -s $PWD/.cobra.yaml $HOME/.cobra.yaml"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "svelte.svelte-vscode",
+        "esbenp.prettier-vscode"
+      ]
+    }
   }
 }
