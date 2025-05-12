@@ -35,7 +35,6 @@ func CloudProvisionWorkflow(ctx workflow.Context, cfg providers.CloudConfig) (*p
 			InitialInterval:    time.Second,
 			BackoffCoefficient: 2.0,
 			MaximumInterval:    time.Minute,
-			MaximumAttempts:    3,
 		},
 	})
 
@@ -102,7 +101,6 @@ func ProvisionNodeWorkflow(
 			InitialInterval:    time.Second,
 			BackoffCoefficient: 2.0,
 			MaximumInterval:    time.Minute,
-			MaximumAttempts:    3,
 		},
 	})
 
