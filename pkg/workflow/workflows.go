@@ -96,7 +96,7 @@ func ProvisionNodeWorkflow(
 	logger.Info("Starting node provisioning workflow")
 
 	ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
-		StartToCloseTimeout: time.Hour,
+		StartToCloseTimeout: time.Minute * 10,
 		RetryPolicy: &temporal.RetryPolicy{
 			InitialInterval:    time.Second,
 			BackoffCoefficient: 2.0,
