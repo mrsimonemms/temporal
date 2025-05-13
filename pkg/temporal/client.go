@@ -25,6 +25,7 @@ import (
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"go.temporal.io/sdk/client"
 	tLog "go.temporal.io/sdk/log"
+	"go.temporal.io/sdk/temporal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -72,6 +73,10 @@ func NewClient(host, namespace, apiKey string) (client.Client, error) {
 		Namespace:         namespace,
 		ConnectionOptions: connectionOptions,
 		Credentials:       credentials,
+		DataConverter:     NewDataConverter(),
+		FailureConverter: temporal.NewDefaultFailureConverter(temporal.DefaultFailureConverterOptions{
+			EncodeCommonAttributes: true,
+		}),
 		Logger: tLog.NewStructuredLogger(slog.New(slogzerolog.Option{
 			Logger: &log.Logger,
 		}.NewZerologHandler())),
