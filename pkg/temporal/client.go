@@ -21,9 +21,11 @@ import (
 	"crypto/tls"
 	"log/slog"
 
+	"github.com/mrsimonemms/temporal/pkg/encryption"
 	"github.com/rs/zerolog/log"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 	tLog "go.temporal.io/sdk/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -72,6 +74,10 @@ func NewClient(host, namespace, apiKey string) (client.Client, error) {
 		Namespace:         namespace,
 		ConnectionOptions: connectionOptions,
 		Credentials:       credentials,
+		DataConverter: encryption.NewEncryptionDataConverter(
+			converter.GetDefaultDataConverter(),
+			encryption.DataConverterOptions{Compress: true},
+		),
 		Logger: tLog.NewStructuredLogger(slog.New(slogzerolog.Option{
 			Logger: &log.Logger,
 		}.NewZerologHandler())),
