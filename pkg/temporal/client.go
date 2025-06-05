@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"log/slog"
 
+	"github.com/mrsimonemms/temporal-codec-server/pkg/temporal"
 	"github.com/rs/zerolog/log"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"go.temporal.io/sdk/client"
@@ -72,6 +73,7 @@ func NewClient(host, namespace, apiKey string) (client.Client, error) {
 		Namespace:         namespace,
 		ConnectionOptions: connectionOptions,
 		Credentials:       credentials,
+		DataConverter:     temporal.DataConverter,
 		Logger: tLog.NewStructuredLogger(slog.New(slogzerolog.Option{
 			Logger: &log.Logger,
 		}.NewZerologHandler())),
